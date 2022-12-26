@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes/Userroutes');
+const albumRoute = require('./routes/Albumroute');
 const bodyParser = require('body-parser');
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const database = mongoose.connection;
 
 app.use('/api', routes)
+app.use('/album',albumRoute)
 database.on('error', (error) => {
     console.log(error)
 })
