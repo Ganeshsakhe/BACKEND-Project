@@ -5,5 +5,4 @@ const dataSchema = new mongoose.Schema({
     lastname: String,
     phonenumber:Number
 })
-
 module.exports = mongoose.model('Data', dataSchema)
