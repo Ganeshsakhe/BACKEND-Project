@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes/Userroutes');
 const albumRoute = require('./routes/Albumroute');
+const photoRoute = require('./routes/Photoroute');
 const bodyParser = require('body-parser');
 const app = express();
 
@@ -16,6 +17,7 @@ const database = mongoose.connection;
 
 app.use('/api', routes)
 app.use('/album',albumRoute)
+app.use('/photo',photoRoute)
 database.on('error', (error) => {
     console.log(error)
 })

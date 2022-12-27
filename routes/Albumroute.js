@@ -29,7 +29,7 @@ Arouter.get('/getAllalbum', async (req, res) => {
 })
 
 
-//Get one user by ID
+//Get one album by ID
 Arouter.get('/getOne/:id', async (req, res) => {
     try{
         const album = await Model.findById(req.params.id);
@@ -39,9 +39,24 @@ Arouter.get('/getOne/:id', async (req, res) => {
         res.status(500).json({message: error.message})
     }
 })
+//get album by user ID
+
+Model.aggregate([{
+        "$lookup":{
+            "from": "datas",
+            "localField": "_id",
+            "foreignField": "firstname",
+            "as": "userinformation",
+        }
+    }]);
 
 
-//Updating the user data using Patch
+
+
+
+
+
+//Updating the album data using Patch
 Arouter.patch('/update/:id', async (req, res) => {
     try {
         const id = req.params.id;
