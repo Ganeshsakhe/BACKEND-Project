@@ -1,7 +1,9 @@
 const express = require('express');
 const Prouter = express.Router()
 const Model = require('../model/Photomodel');
-// const AModel = require('../model/Albummodel');
+const AModel = require('../model/Albummodel');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId
 
 Prouter.post('/postphoto', async (req, res) => {
     console.log(req.body)
@@ -14,7 +16,7 @@ Prouter.post('/postphoto', async (req, res) => {
     console.log(photo);
     try {
         const photoToSave = await photo.save();
-        // new date();
+        new date();
         res.status(200).json(photoToSave)
     }
     catch (error) {
@@ -47,7 +49,12 @@ Prouter.get('/getOne/:id', async (req, res) => {
 //get photo by Album
 Prouter.get('/getPhotoByAlbum/:id', (req, res) => {
     Model.aggregate([
-        { $match: { $expr: { $eq: ["$albumid", { $toObjectId: req.query.albumid }] } } },
+        // { $match: { $expr: { $eq: ["$albumid", { $toObjectId: req.query.albumid }] } } },
+        {
+            $match:{
+                albumid:ObjectId(req.params.id)
+            }
+           },
         { $lookup: { from: "albums", localField: "albumid", foreignField: "_id", as: "albuminfo" } },
         { $lookup: { from: "users", localField: "userid", foreignField: "_id", as: "user" } }
 			
@@ -68,9 +75,15 @@ Prouter.get('/getPhotoByAlbum/:id', (req, res) => {
 })
 //get Photo by user
 
-Prouter.get('/getPhotoByUser',(req, res) => {
+Prouter.get('/getPhotoByUser/:id',(req, res) => {
     Model.aggregate([
-        { $match: { $expr: { $eq: ["$userid", { $toObjectId: req.query.userid }] } } },
+        // { $match: { $expr: { $eq: ["$userid", { $toObjectId: req.query.userid }] } } },
+        {
+            $match:
+            {
+                userid:ObjectId(req.params.id)
+            }
+        },
         { $lookup: { from: "users", localField: "userid", foreignField: "_id", as: "user" } }
     ], (error, data) => {
         if (!error) {
