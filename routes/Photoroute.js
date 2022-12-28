@@ -1,18 +1,20 @@
 const express = require('express');
 const Prouter = express.Router()
 const Model = require('../model/Photomodel');
+// const AModel = require('../model/Albummodel');
 
 Prouter.post('/postphoto', async (req, res) => {
     console.log(req.body)
     const photo = new Model({
-        // Album_id:req.body.Album_id,
-        // User_id:req.body.User_id,
-        Name: req.body.Name,
-        ImageUrl:req.body.ImageUrl,
+        albumid:req.body.Album_id,
+        userid:req.body.User_id,
+        name: req.body.Name,
+       ImageUrl:req.body.ImageUrl,
     })
     console.log(photo);
     try {
         const photoToSave = await photo.save();
+        // new date();
         res.status(200).json(photoToSave)
     }
     catch (error) {
@@ -42,13 +44,47 @@ Prouter.get('/getOne/:id', async (req, res) => {
         res.status(500).json({message: error.message})
     }
 })
-//get photo by user ID
+//get photo by Album
+Prouter.get('/getPhotoByAlbum/:id', (req, res) => {
+    Model.aggregate([
+        { $match: { $expr: { $eq: ["$albumid", { $toObjectId: req.query.albumid }] } } },
+        { $lookup: { from: "albums", localField: "albumid", foreignField: "_id", as: "albuminfo" } },
+        { $lookup: { from: "users", localField: "userid", foreignField: "_id", as: "user" } }
+			
+    ], (err, data) => {
+        if (!err) {
+            res.status(200).json({
+                message: "Photos fetched successfully",
+                photos: data
+            })
+        } else {
+            console.log(error)
+            res.status(404).json({
+                message: "Error in fetching photos",
+                error: err
+            })
+        }
+    })
+})
+//get Photo by user
 
-
-
-
-
-
+Prouter.get('/getPhotoByUser',(req, res) => {
+    Model.aggregate([
+        { $match: { $expr: { $eq: ["$userid", { $toObjectId: req.query.userid }] } } },
+        { $lookup: { from: "users", localField: "userid", foreignField: "_id", as: "user" } }
+    ], (error, data) => {
+        if (!error) {
+            res.status(200).json({
+                message: "Photos Found",
+                photos: data
+            })
+        } else {
+            res.status(404).json({
+                message: "Error in finding Photos",
+            })
+        }
+    })
+})
 
 
 
@@ -81,4 +117,8 @@ Prouter.delete('/delete/:id', async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 })
-module.exports = Prouter;
+module.exports = 
+
+    Prouter
+    
+

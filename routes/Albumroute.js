@@ -1,11 +1,15 @@
 const express = require('express');
 const Arouter = express.Router()
 const Model = require('../model/Albummodel');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId
+
 
 Arouter.post('/postalbum', async (req, res) => {
     console.log(req.body)
     const album = new Model({
-        Name: req.body.Name
+        userid: req.body.userid,
+        name: req.body.name
     })
     console.log(album);
     try {
@@ -40,19 +44,25 @@ Arouter.get('/getOne/:id', async (req, res) => {
     }
 })
 //get album by user ID
-
-Model.aggregate([{
-        "$lookup":{
-            "from": "datas",
-            "localField": "_id",
-            "foreignField": "firstname",
-            "as": "userinformation",
-        }
-    }]);
-
-
-
-
+Arouter.get('/AlbumbyUser/:id',async (req, res) => {
+    try{
+        const album = await Model.aggregate([
+            // { $match: { $expr: { $eq: ["$userid", { $toObjectId: req.query.userid }] } } },
+            
+           {
+            $match:{
+                userid:ObjectId(req.params.id)
+            }
+           },
+            { $lookup: { from: "datas", localField: "userid", foreignField: "_id", as: "userinfo" } },    
+    ]);
+        
+        res.json(album)
+    }
+    catch(error){
+        res.status(500).json({message: error.message})
+    }
+})
 
 
 
@@ -85,4 +95,4 @@ Arouter.delete('/delete/:id', async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 })
-module.exports = Arouter;
+module.exports =  Arouter;
