@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const photoSchema = new mongoose.Schema({
-    // Album_id: String,
-    // User_id:String,
-    Name:String,
+    albumid: String,
+    userid:String,
+    name:String,
     ImageUrl: String,
     date: { type: Date, default: Date.now },
 })
